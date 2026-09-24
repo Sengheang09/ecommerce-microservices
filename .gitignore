@@ -1,0 +1,33 @@
+
+# 1. Environment & Secrets (NEVER PUSH!)
+.env
+.env.local
+.env.*.local
+*.env
+*.pem
+*.key
+
+!.env.example
+
+# 2. Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.suo
+*.user
+
+# 3. Java & Gradle (auth-service & api-gateway)
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+*.log
+
+# 4. .NET & C# (user-service)
+bin/
+obj/
+appsettings.Production.json
+*.userosscache
