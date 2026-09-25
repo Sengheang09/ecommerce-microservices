@@ -7,14 +7,17 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
+
 @Component
 public class JwtUtil {
     @Value("${app.jwt.secret}")
     private String secret;
+
     private SecretKey getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
     public Claims getAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignKey())
@@ -22,6 +25,7 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
     public boolean isTokenValid(String token) {
         try {
             getAllClaims(token);
@@ -30,9 +34,11 @@ public class JwtUtil {
             return false;
         }
     }
+
     public String extractUsername(String token) {
         return getAllClaims(token).getSubject();
     }
+
     public Long extractUserId(String token) {
         Claims claims = getAllClaims(token);
         Object userId = claims.get("userId");

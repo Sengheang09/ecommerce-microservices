@@ -19,18 +19,20 @@ spring:
             allowedHeaders: "*"
 
       routes:
-        # Spring Boot
         - id: auth-service
           uri: http://localhost:8081
           predicates:
             - Path=/api/auth/**
 
-        # ASP.NET Core
-
         - id: core-service 
           uri: http://localhost:5059
           predicates:
             - Path=/api/**
+
+        - id: inventory-service
+          uri: http://localhost:5060
+          predicates:
+            - Path=/api/Inventory/**, /api/inventory/**
 
 app:
   jwt:
