@@ -16,12 +16,14 @@ namespace user_service.Services.Impl
             IOrderRepository orderRepository,
             ICartRepository cartRepository,
             ICustomerRepository customerRepository,
-            IAddressRepository addressRepository)
+            IAddressRepository addressRepository,
+            IKafkaProducerService kafkaProducer) // បន្ថែមត្រង់នេះ
         {
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
             _customerRepository = customerRepository;
             _addressRepository = addressRepository;
+            _kafkaProducer = kafkaProducer;
         }
 
         public async Task<IEnumerable<OrderResponseDto>> GetAllAsync()
@@ -120,6 +122,21 @@ namespace user_service.Services.Impl
 
             // Clear Cart after successful checkout
             await _cartRepository.ClearCartAsync(cart.Id);
+
+            var orderEvent = new user_service.Events.OrderPlacedEvent
+            {
+                OrderId = createdOrder.Id,
+                OrderNumber = createdOrder.OrderNumber,
+                CustomerId = createdOrder.CustomerId,
+                TotalAmount = createdOrder.Total,
+                CreatedAt = createdOrder.CreatedAt,
+                Items = createdOrder.Items.Select(i => new user_service.Events.OrderPlacedItemEvent
+                {
+                    ProductVariantId = i.ProductVariantId,
+                    Quantity = i.Quantity
+                }).ToList()
+            };
+            _ = Task.Run(() => _kafkaProducer.ProduceAsync("order-placed-topic", orderEvent));
 
             var reloaded = await _orderRepository.GetByIdAsync(createdOrder.Id);
             return MapToDto(reloaded ?? createdOrder);

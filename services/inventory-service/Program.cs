@@ -52,6 +52,7 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
 // Dependency Injection
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddHostedService<OrderEventConsumerService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
